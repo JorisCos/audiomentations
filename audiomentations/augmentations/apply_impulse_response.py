@@ -49,8 +49,8 @@ class ApplyImpulseResponse(BaseWaveformTransform):
         self.leave_length_unchanged = leave_length_unchanged
 
     @staticmethod
-    def __load_ir(file_path, sample_rate, mono):
-        return load_sound_file(file_path, sample_rate, mono=mono)
+    def __load_ir(file_path, sample_rate, mono , offset=0, duration=None):
+        return load_sound_file(file_path, sample_rate, mono=mono, offset=offset, duration=duration)
 
     def randomize_parameters(self, samples: NDArray[np.float32], sample_rate: int):
         super().randomize_parameters(samples, sample_rate)
@@ -60,7 +60,7 @@ class ApplyImpulseResponse(BaseWaveformTransform):
     def apply(self, samples: NDArray[np.float32], sample_rate: int) -> NDArray[np.float32]:
         # Determine if the impulse response should be loaded as mono
         load_mono_ir = samples.ndim == 1
-        ir, sample_rate2 = self.__load_ir(self.parameters["ir_file_path"], sample_rate, mono=load_mono_ir)
+        ir, sample_rate2 = self.__load_ir(self.parameters["ir_file_path"], sample_rate, mono=load_mono_ir, offset=0, duration=len(samples) / sample_rate)
         if sample_rate != sample_rate2:
             # This will typically not happen, as librosa should automatically resample the
             # impulse response sound to the desired sample rate
